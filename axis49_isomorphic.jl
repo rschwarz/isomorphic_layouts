@@ -83,3 +83,9 @@ function layout_mapping(m)
     end
     return layout
 end
+
+# Some mappings:
+#   Original Harmonic Table: ( 4, -3)
+#   Rotated Harmonic Table:  ( 3,  4)
+#   Wicki Hayden Layout:     ( 5,  7)
+#   Linnstrument:            ( 4,  5)
