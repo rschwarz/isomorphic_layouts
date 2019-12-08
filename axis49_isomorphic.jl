@@ -21,14 +21,13 @@ selfless_layout_ccw = [
 
 rev_layout_ccw = [ci.I for ci in indexin(1:98, selfless_layout_ccw)]
 
-#                   nw    ne   e    se    sw     w
-neighbor_offsets = [-1 1; 1 1; 2 0; 1 -1; -1 -1; -2 0]
+# First index is for vertical index, second for horizontal.
+# Array indices increase while going south and east!
+#                   nw     ne    e    se   sw    w
+neighbor_offsets = [-1 -1; -1 1; 0 2; 1 1; 1 -1; 0 -2]
 
 "Coordinates of neigbors; might be out of bounds."
 raw_neighbors(i, j) = [i j] .+ neighbor_offsets
-
-"Check which indices (row-wise) are in bounds of array."
-in_bounds(A, idcs) = [checkbounds(Bool, A, idx...) for idx in eachrow(idcs)]
 
 "MIDI note offsets for neighbors"
 note_offsets(nw, ne) = [nw, ne, ne - nw, -nw, -ne, nw - ne]
