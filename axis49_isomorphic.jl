@@ -19,6 +19,8 @@ selfless_layout_ccw = [
      1  0  2  0  3  0  4  0  5  0  6  0  7  0  0
 ]
 
+rev_layout_ccw = [ci.I for ci in indexin(1:98, selfless_layout_ccw)]
+
 #                   nw    ne   e    se    sw     w
 neighbor_offsets = [-1 1; 1 1; 2 0; 1 -1; -1 -1; -2 0]
 
@@ -27,3 +29,58 @@ raw_neighbors(i, j) = [i j] .+ neighbor_offsets
 
 "Check which indices (row-wise) are in bounds of array."
 in_bounds(A, idcs) = [checkbounds(Bool, A, idx...) for idx in eachrow(idcs)]
+
+"MIDI note offsets for neighbors"
+note_offsets(nw, ne) = [nw, ne, ne - nw, -nw, -ne, nw - ne]
+#                               e        se   sw   w
+
+function find_mapping(nw, ne)
+    # initial mapping with anchor
+    mapping = zeros(Int, 98)
+    mapping[53] = 60
+
+    # note offsets in all 6 directions
+    offsets = note_offsets(nw, ne)
+
+    # repeat propagation until nothing changes anymore
+    while true
+        had_change = false
+
+        # try all existing entries in mapping
+        for (key, val) in enumerate(mapping)
+            val == 0 && continue
+
+            # find coordinate of key in Axis-49 layout
+            i, j = rev_layout_ccw[key]
+
+            # see if we can propagate to any neighbor
+            for (nb, off) in zip(eachrow(raw_neighbors(i, j)), offsets)
+                (k, l) = nb
+
+                # only use valid neighbors (in bounds)
+                checkbounds(Bool, selfless_layout_ccw, k, l) || continue
+                key_nb = selfless_layout_ccw[k, l]
+                key_nb != 0 || continue
+
+                # skip existing mapping entries
+                mapping[key_nb] == 0 || continue
+
+                # propagate!
+                mapping[key_nb] = val + off
+                had_change = true
+            end
+        end
+
+        had_change || break
+    end
+
+    return mapping
+end
+
+function layout_mapping(m)
+    layout = zeros(Int, 14, 15)
+    for (k, v) in zip(rev_layout_ccw, m)
+        layout[k...] = v
+    end
+    return layout
+end
