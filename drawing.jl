@@ -27,7 +27,7 @@ function hexagon!(coordinates, label)
 end
 
 function draw_layout(layout)
-    s = make_scene(400, 800)
+    s = make_scene(400, 640)
     m, n = size(layout)
     for x in 1:n, y in 1:m
         value = layout[y, x]
