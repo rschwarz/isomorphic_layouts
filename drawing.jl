@@ -9,7 +9,7 @@ end
 hexwidth(size) = sqrt(3.0) * size
 hexheight(size) = 2.0 * size
 
-function hexagon!(coordinates, value)
+function hexagon!(coordinates, value, scalen=12)
     size = 100
     w, h = hexwidth(size), hexheight(size)
     center = coordinates .* [0.5*w 0.75*h]
@@ -24,22 +24,22 @@ function hexagon!(coordinates, value)
     cx, cy = center
     points = [Point2f0(r) for r in eachrow(vertices)]
 
-    note = value % 12
+    note = value % scalen
     octave = (value + 32) / (128 + 32)
-    fillcolor = HSL(note * 360 / 12, 0.6, octave)
+    fillcolor = HSL(note * 360 / scalen, 0.6, octave)
     poly!(points, strokewidth=2, strokecolor=:black, color=fillcolor)
 
     label = @sprintf("%02d ", value)
     text!(label, position=(cx - 35, cy - 15), textsize=30)
 end
 
-function draw_layout(layout)
+function draw_layout(layout, scalen=12)
     s = make_scene(400, 640)
     m, n = size(layout)
     for x in 1:n, y in 1:m
         value = layout[y, x]
         value != 0 || continue
-        hexagon!([x (m - y)], value)
+        hexagon!([x (m - y)], value, scalen)
     end
     return s
 end
